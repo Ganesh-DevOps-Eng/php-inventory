@@ -1,6 +1,7 @@
 {
     "require": {
         "vlucas/phpdotenv": "^5.3",
-        "php": "^8.1"
+        "php": "^8.1",
+        "onelogin/php-saml": "^2.0"
     }
 }
