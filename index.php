@@ -10,10 +10,11 @@ if (isset($_SESSION['userId'])) {
 $errors = array();
 
 // Check if the user is trying to log in via SSO
-if (isset($_GET['sso_login']) && $_GET['sso_login'] == 'true') {
+// if (isset($_GET['sso_login']) && $_GET['sso_login'] == 'true') {
+if (isset($_SESSION['sso_login']) && $_SESSION['sso_login'] === true) {
     // Implement your SSO login logic here
     // Redirect to the dashboard if SSO login is successful
-    header('location:' . $store_url . 'dashboard.php');
+    header('Location: successful-sso-login.php');
 } elseif ($_POST) {
     $username = $_POST['username'];
     $password = $_POST['password'];
