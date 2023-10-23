@@ -10,21 +10,18 @@ if (isset($_SESSION['userId'])) {
 $errors = array();
 
 // Check if the user is trying to log in via SSO
-// if (isset($_GET['sso_login']) && $_GET['sso_login'] == 'true') {
 if (isset($_SESSION['sso_login']) && $_SESSION['sso_login'] === true) {
-    // Implement your SSO login logic here
-    // Redirect to the dashboard if SSO login is successful
     header('Location: successful-sso-login.php');
 } elseif ($_POST) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
     if (empty($username) || empty($password)) {
-        if ($username == "") {
+        if (empty($username)) {
             $errors[] = "Username is required";
         } 
 
-        if ($password == "") {
+        if (empty($password)) {
             $errors[] = "Password is required";
         }
     } else {
@@ -54,28 +51,23 @@ if (isset($_SESSION['sso_login']) && $_SESSION['sso_login'] === true) {
     } // /else not empty username // password
 } // /if $_POST
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Stock Management System</title>
-
     <!-- bootstrap -->
     <link rel="stylesheet" href="assests/bootstrap/css/bootstrap.min.css">
     <!-- bootstrap theme-->
     <link rel="stylesheet" href="assests/bootstrap/css/bootstrap-theme.min.css">
     <!-- font awesome -->
     <link rel="stylesheet" href="assests/font-awesome/css/font-awesome.min.css">
-
     <!-- custom css -->
     <link rel="stylesheet" href="custom/css/custom.css">    
-
     <!-- jquery -->
     <script src="assests/jquery/jquery.min.js"></script>
     <!-- jquery ui -->  
     <link rel="stylesheet" href="assests/jquery-ui/jquery-ui.min.css">
     <script src="assests/jquery-ui/jquery-ui.min.js"></script>
-
     <!-- bootstrap js -->
     <script src="assests/bootstrap/js/bootstrap.min.js"></script>
 </head>
@@ -88,7 +80,6 @@ if (isset($_SESSION['sso_login']) && $_SESSION['sso_login'] === true) {
                         <h3 class="panel-title">Please Sign in</h3>
                     </div>
                     <div class="panel-body">
-
                         <div class="messages">
                             <?php if ($errors) {
                                 foreach ($errors as $key => $value) {
@@ -98,7 +89,6 @@ if (isset($_SESSION['sso_login']) && $_SESSION['sso_login'] === true) {
                                     }
                                 } ?>
                         </div>
-
                         <form class="form-horizontal" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post" id="loginForm">
                             <fieldset>
                               <div class="form-group">
@@ -120,7 +110,6 @@ if (isset($_SESSION['sso_login']) && $_SESSION['sso_login'] === true) {
                                 </div>
                             </fieldset>
                         </form>
-
                         <!-- SSO Login Button -->
                         <a href="sso-login.php">Login with SSO</a>
                     </div>
