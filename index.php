@@ -3,55 +3,90 @@ require_once 'php_action/db_connect.php';
 
 session_start();
 
-if (isset($_SESSION['userId'])) {
-    header('location:' . $store_url . 'dashboard.php');		
-}
-
-$errors = array();
-
-// Check if the user is trying to log in via SSO
+// Check if SSO login is requested
 if (isset($_GET['sso']) && $_GET['sso'] == 'true') {
-    // Implement your SSO login logic here
-    // Redirect to the dashboard if SSO login is successful
-    header('location:' . $store_url . 'dashboard.php');
-} elseif ($_POST) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    require_once 'vendor/autoload.php'; // Include the OneLogin toolkit
 
-    if (empty($username) || empty($password)) {
-        if ($username == "") {
-            $errors[] = "Username is required";
-        } 
+    $azureADSettings = array(
+        'strict' => true,
+        'sp' => array(
+            'entityId' => 'https://matelliocorp-eb-env.eba-xpnbqghi.us-east-1.elasticbeanstalk.com/',
+            'assertionConsumerService' => array(
+                'url' => 'https://matelliocorp-eb-env.eba-xpnbqghi.us-east-1.elasticbeanstalk.com/dashboard.php',
+                'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+            ),
+            'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
+            'x509cert' => '', // Your SP x509 certificate (leave empty if not used)
+            'privateKey' => '', // Your SP private key (leave empty if not used)
+        ),
+        'idp' => array(
+            'entityId' => 'https://sts.windows.net/4c1a87da-93b7-4e87-b5ad-da86a9c2ae72/',
+            'singleSignOnService' => array(
+                'url' => 'https://login.microsoftonline.com/4c1a87da-93b7-4e87-b5ad-da86a9c2ae72/saml2',
+                'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+            ),
+            'x509cert' => '', // IdP x509 certificate (leave empty if not used)
+        ),
+    );
 
-        if ($password == "") {
-            $errors[] = "Password is required";
-        }
+    $samlAuth = new OneLogin_Saml2_Auth($azureADSettings);
+
+    if (!$samlAuth->isAuthenticated()) {
+        // Redirect the user to the IdP for authentication
+        $samlAuth->login();
     } else {
-        $sql = "SELECT * FROM users WHERE username = '$username'";
-        $result = $connect->query($sql);
+        // User is authenticated, you can access user information with $samlAuth->getAttributes()
+        $username = $samlAuth->getAttributes()['NameID'][0];
+        // Store the user's information or perform further actions
+        $_SESSION['sso_login'] = true;
 
-        if ($result->num_rows == 1) {
-            $password = md5($password);
-            // exists
-            $mainSql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-            $mainResult = $connect->query($mainSql);
+        // Redirect to the successful SSO login page
+        header('Location: dashboard.php');
+    }
+} elseif (isset($_SESSION['userId'])) {
+    // User is already logged in
+    header('Location: dashboard.php');
+} else {
+    $errors = array();
 
-            if ($mainResult->num_rows == 1) {
-                $value = $mainResult->fetch_assoc();
-                $user_id = $value['user_id'];
+    if ($_POST) {
+        $username = $_POST['username'];
+        $password = $_POST['password'];
 
-                // set session
-                $_SESSION['userId'] = $user_id;
+        if (empty($username) || empty($password)) {
+            if (empty($username)) {
+                $errors[] = "Username is required";
+            } 
 
-                header('location:' . $store_url . 'dashboard.php');	
-            } else {
-                $errors[] = "Incorrect username/password combination";
-            } // /else
-        } else {		
-            $errors[] = "Username does not exist";		
-        } // /else
-    } // /else not empty username // password
-} // /if $_POST
+            if (empty($password)) {
+                $errors[] = "Password is required";
+            }
+        } else {
+            $sql = "SELECT * FROM users WHERE username = '$username'";
+            $result = $connect->query($sql);
+
+            if ($result->num_rows == 1) {
+                $password = md5($password); // Note: Consider using more secure password hashing methods
+                $mainSql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+                $mainResult = $connect->query($mainSql);
+
+                if ($mainResult->num_rows == 1) {
+                    $value = $mainResult->fetch_assoc();
+                    $user_id = $value['user_id'];
+
+                    // Set session
+                    $_SESSION['userId'] = $user_id;
+
+                    header('Location: dashboard.php');
+                } else {
+                    $errors[] = "Incorrect username/password combination";
+                }
+            } else {		
+                $errors[] = "Username does not exist";		
+            }
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -59,23 +94,23 @@ if (isset($_GET['sso']) && $_GET['sso'] == 'true') {
 <head>
     <title>Stock Management System</title>
 
-    <!-- bootstrap -->
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="assests/bootstrap/css/bootstrap.min.css">
-    <!-- bootstrap theme-->
+    <!-- Bootstrap theme-->
     <link rel="stylesheet" href="assests/bootstrap/css/bootstrap-theme.min.css">
-    <!-- font awesome -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="assests/font-awesome/css/font-awesome.min.css">
 
-    <!-- custom css -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="custom/css/custom.css">    
 
-    <!-- jquery -->
+    <!-- jQuery -->
     <script src="assests/jquery/jquery.min.js"></script>
-    <!-- jquery ui -->  
+    <!-- jQuery UI -->  
     <link rel="stylesheet" href="assests/jquery-ui/jquery-ui.min.css">
     <script src="assests/jquery-ui/jquery-ui.min.js"></script>
 
-    <!-- bootstrap js -->
+    <!-- Bootstrap JS -->
     <script src="assests/bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body>
@@ -94,8 +129,8 @@ if (isset($_GET['sso']) && $_GET['sso'] == 'true') {
                                     echo '<div class="alert alert-warning" role="alert">
                                     <i class="glyphicon glyphicon-exclamation-sign"></i>
                                     ' . $value . '</div>';										
-                                    }
-                                } ?>
+                                }
+                            } ?>
                         </div>
 
                         <form class="form-horizontal" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post" id="loginForm">
@@ -107,7 +142,7 @@ if (isset($_GET['sso']) && $_GET['sso'] == 'true') {
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="password" class="col-sm-2 control-label">Password</label>
+                                    <label for "password" class="col-sm-2 control-label">Password</label>
                                     <div class="col-sm-10">
                                       <input type="password" class="form-control" id="password" name="password" placeholder="Password" autocomplete="off" />
                                     </div>
@@ -121,7 +156,7 @@ if (isset($_GET['sso']) && $_GET['sso'] == 'true') {
                         </form>
 
                         <!-- SSO Login Button -->
-                        <a href="sso-login.php">Login with SSO</a>
+                        <a href="<?php echo $_SERVER['PHP_SELF'] ?>?sso=true">Login with SSO</a>
                     </div>
                     <!-- panel-body -->
                 </div>
