@@ -11,9 +11,9 @@ require_once 'db_connect.php';
 // }
 		
 
-// if(!$_SESSION['userId']) {
-// 	header('location:'.$store_url);	
-// } 
+if(!$_SESSION['userId']) {
+	header('location:'.$store_url);	
+} 
 
 
 ?>
