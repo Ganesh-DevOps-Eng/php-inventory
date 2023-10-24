@@ -24,6 +24,9 @@ $azureADSettings = array(
 );
 
 $samlAuth = new OneLogin_Saml2_Auth($azureADSettings);
+echo "<pre>";
+print_r($samlAuth->isAuthenticated());
+echo "</pre>";
 
 if (!$samlAuth->isAuthenticated()) {
     // Redirect the user to the IdP for authentication
