@@ -23,12 +23,9 @@ $azureADSettings = array(
     ),
 );
 
-$samlAuth = new OneLogin_Saml2_Auth($azureADSettings);
-echo "<pre>";
-print_r($samlAuth->isAuthenticated());
-echo "</pre>";
+$samlAuth = new OneLogin_Saml2_Auth($azureADSettings);  
 
-if ($samlAuth->isAuthenticated()) {
+if (!$samlAuth->isAuthenticated()) {
     // Redirect the user to the IdP for authentication
     $samlAuth->login();
 } else {
@@ -41,6 +38,7 @@ if ($samlAuth->isAuthenticated()) {
     $_SESSION['sso_login'] = true;
 
     // Redirect to the successful SSO login page
-    header('location:' . $store_url . 'dashboard.php');
+    // header('location:' . $store_url . 'dashboard.php');
+    header('Location: dashboard.php');
     exit; // Add this line to stop script execution
 }
