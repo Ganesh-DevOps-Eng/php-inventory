@@ -10,7 +10,7 @@ if (isset($_SESSION['userId'])) {
 $errors = array();
 
 // Check if the user is trying to log in via SSO
-if (isset($_SESSION['sso_login']) && $_SESSION['sso_login'] === true) {
+if (isset($_SESSION['sso-login']) && $_SESSION['sso-login'] === true) {
     header('Location: dashboard.php');
 } elseif ($_POST) {
     $username = $_POST['username'];

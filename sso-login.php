@@ -35,7 +35,7 @@ if (!$samlAuth->isAuthenticated()) {
     // Redirect the user to your application's home page or other appropriate page
     //header('Location: /your-home-page.php');
     // After successful SSO login
-    $_SESSION['sso_login'] = true;
+    $_SESSION['sso-login'] = true;
 
     // Redirect to the successful SSO login page
     header('Location: dashboard.php');	
