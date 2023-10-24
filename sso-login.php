@@ -39,6 +39,6 @@ if (!$samlAuth->isAuthenticated()) {
 
     // Redirect to the successful SSO login page
     // header('location:' . $store_url . 'dashboard.php');
-    header('Location: dashboard.php');
+    header('location:'. $store_url . 'dashboard.php');
     exit; // Add this line to stop script execution
 }
