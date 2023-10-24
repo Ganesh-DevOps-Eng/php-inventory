@@ -12,7 +12,7 @@ $errors = array();
 
 // Check if the user is trying to log in via SSO
 if (isset($_SESSION['sso_login']) && $_SESSION['sso_login'] === true) {
-    header('location: ' . $store_url . 'dashboard.php');
+    header('Location: dashboard.php');
     exit; // Add an exit to stop script execution after redirection
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') { // Use $_SERVER['REQUEST_METHOD'] for more robust form handling
     $username = isset($_POST['username']) ? $_POST['username'] : '';
