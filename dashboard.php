@@ -2,6 +2,8 @@
 
 <?php 
 
+$_SESSION['sso_login'] = true;
+
 $sql = "SELECT * FROM product WHERE status = 1";
 $query = $connect->query($sql);
 $countProduct = $query->num_rows;

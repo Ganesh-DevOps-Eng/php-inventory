@@ -6,7 +6,7 @@ $azureADSettings = array(
     'sp' => array(
         'entityId' => 'https://matelliocorp-eb-env.eba-5r5cia6k.us-east-1.elasticbeanstalk.com/', // Your Service Provider Entity ID
         'assertionConsumerService' => array(
-            'url' => 'https://matelliocorp-eb-env.eba-5r5cia6k.us-east-1.elasticbeanstalk.com/sso-login.php', // Your application's SSO callback URL
+            'url' => 'https://matelliocorp-eb-env.eba-5r5cia6k.us-east-1.elasticbeanstalk.com/dashboard.php', // Your application's SSO callback URL
             'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
         ),
         'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
@@ -24,11 +24,6 @@ $azureADSettings = array(
 );
 
 $samlAuth = new OneLogin_Saml2_Auth($azureADSettings);  
-
-echo "<pre>";
-print_r($samlAuth->getAttributes());
-echo "</pre>";
-echo "adasd";
 
 if (!$samlAuth->isAuthenticated()) {
     // Redirect the user to the IdP for authentication
