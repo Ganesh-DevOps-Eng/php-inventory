@@ -11,9 +11,9 @@ if (isset($_SESSION['sso_login']) && $_SESSION['sso_login'] === true){
 }
 		
 
-if(!$_SESSION['userId']) {
-	header('location:'.$store_url);	
-} 
+// if(!$_SESSION['userId']) {
+// 	header('location:'.$store_url);	
+// } 
 
 
 ?>
