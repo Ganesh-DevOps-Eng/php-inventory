@@ -28,7 +28,7 @@ $samlAuth = new OneLogin_Saml2_Auth($azureADSettings);
 echo "<pre>";
 print_r($samlAuth->getAttributes());
 echo "</pre>";
-die("adasd");
+echo "adasd";
 
 if (!$samlAuth->isAuthenticated()) {
     // Redirect the user to the IdP for authentication
